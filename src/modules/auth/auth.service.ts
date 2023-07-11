@@ -30,35 +30,35 @@ class AuthService {
         }
 
     }
-    public async signup({ currency, email, password, referralCode }: SignUpPayload): Promise<{ userId: string }> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                await prisma.$transaction(async (transaction) => {
-                    const user: UserType | null = await transaction.user.findUnique({ where: { email } });
-                    if (user) {
-                        throwError('User account already exists', StatusCodes.UNPROCESSABLE_ENTITY);
-                    }
-                    const hashedPassword = bcrypt.hashSync(password, 8);
-                    const createAccount = await transaction.user.create({
-                        data: {
-                            password: hashedPassword,
-                            email: email,
-                            currency: currency,
-                            referralCode: referralCode || '',
-                            emailVerified: false,
-                        },
-                    });
-                    if (!createAccount) {
-                        throwError('Encounter error creating account', StatusCodes.INSUFFICIENT_STORAGE);
-                    }
-                    await this.generateOtp(email);
-                    resolve({ userId: createAccount.id });
-                }, { timeout: 10000 });
-            } catch (error: any) {
-                reject(throwError(error.message, StatusCodes.INSUFFICIENT_STORAGE));
-            }
-        });
+    public async signup({ currency, email, password, referralCode }: SignUpPayload) {
+        try {
+            const account = await prisma.$transaction(async (transaction) => {
+                const user: UserType | null = await transaction.user.findUnique({ where: { email } });
+                if (user) {
+                    throwError('User account already exists', StatusCodes.UNPROCESSABLE_ENTITY);
+                }
+                const hashedPassword = bcrypt.hashSync(password, 8);
+                const createAccount = await transaction.user.create({
+                    data: {
+                        password: hashedPassword,
+                        email: email,
+                        currency: currency,
+                        referralCode: referralCode || '',
+                        emailVerified: false,
+                    },
+                });
+                if (!createAccount) {
+                    throwError('Encounter error creating account', StatusCodes.INSUFFICIENT_STORAGE);
+                }
+                await this.generateOtp(email);
+                return { userId: createAccount.id };
+            }, { timeout: 10000 });
+            return account
+        } catch (error: any) {
+            throwError(error.message, StatusCodes.INSUFFICIENT_STORAGE);
+        }
     }
+
     private async generateOtp(email: string): Promise<void> {
         try {
             const otp = otpGenerator.generate(6, { digits: true, specialChars: false, upperCaseAlphabets: false, lowerCaseAlphabets: false });

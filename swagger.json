@@ -122,10 +122,21 @@
         }
       }
     },
-    "/api/v1/auth/create-profile": {
+    "/api/v1/auth/create-profile/{studentId}": {
       "post": {
         "summary": "Create user profile",
         "tags": ["Authentication"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the student"
+          }
+        ],
         "requestBody": {
           "description": "User profile data",
           "required": true,

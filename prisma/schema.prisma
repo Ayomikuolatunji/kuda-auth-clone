@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+    // directUrl         = env("DIRECT_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @unique @default(uuid())
+  email        String   @unique
+  password     String
+  currency      Currency
+  referralCode String?
+  otp          String?
+  userProfile  Profile?
+  emailVerified  Boolean @default(false)
+}
+
+model Profile {
+  id          String @id @unique @default(uuid())
+  firstName   String
+  middleName  String?
+  lastName    String
+  gender      Gender
+  dateOfBirth DateTime
+  userName    String? @unique
+  userId      String @unique
+  phoneNumber String @unique
+  user        User   @relation(fields: [userId], references: [id])
+}
+
+enum Currency {
+  NGN_NAIRA
+  GBP_ACCOUNT
+  UGX_ACCOUNT
+  GHS_ACCOUNT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}

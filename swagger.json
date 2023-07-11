@@ -6,7 +6,7 @@
     "description": "Kuda API Clone Documentation"
   },
   "paths": {
-    "/login": {
+    "/api/v1/login": {
       "post": {
         "summary": "Log in user",
         "tags": ["Authentication"],
@@ -46,7 +46,7 @@
         }
       }
     },
-    "/signup": {
+    "/api/v1/signup": {
       "post": {
         "summary": "Sign up user",
         "tags": ["Authentication"],
@@ -88,7 +88,7 @@
         }
       }
     },
-    "/resend-otp": {
+    "/api/v1/resend-otp": {
       "post": {
         "summary": "Resend OTP",
         "tags": ["Authentication"],
@@ -122,7 +122,7 @@
         }
       }
     },
-    "/create-profile": {
+    "/api/v1/create-profile": {
       "post": {
         "summary": "Create user profile",
         "tags": ["Authentication"],
@@ -156,7 +156,7 @@
         }
       }
     },
-    "/verify-email": {
+    "/api/v1/verify-email": {
       "post": {
         "summary": "Verify email with OTP",
         "tags": ["Authentication"],

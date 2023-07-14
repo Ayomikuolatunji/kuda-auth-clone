@@ -60,18 +60,17 @@ class AuthService {
     }
 
     private async generateOtp(email: string): Promise<void> {
-        try {
-            const otp = otpGenerator.generate(6, { digits: true, specialChars: false, upperCaseAlphabets: false, lowerCaseAlphabets: false });
-            const updateUser = await prisma.user.update({
-                where: { email },
-                data: { otp },
-            });
-            if (updateUser) {
-                throwError('Encounter error', StatusCodes.INTERNAL_SERVER_ERROR);
-            }
-            await this.sendOtpEmail(email, 12344);
-        } catch (error: any) {
+
+        const otp = otpGenerator.generate(6, { digits: true, specialChars: false, upperCaseAlphabets: false, lowerCaseAlphabets: false });
+        const updateUser = await prisma.user.update({
+            where: { email },
+            data: { otp },
+        });
+        if (updateUser) {
+            throwError('Encounter error', StatusCodes.INTERNAL_SERVER_ERROR);
         }
+        await this.sendOtpEmail(email, 12344);
+
     }
     private async sendOtpEmail(email: string, otp: number): Promise<void> {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
@@ -96,7 +95,7 @@ class AuthService {
     public async resendOtp(email: string): Promise<void> {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || user.emailVerified) {
-            throwError('User not found or already verified', StatusCodes.NOT_FOUND);
+            throwError('User not found', StatusCodes.NOT_FOUND);
         }
         await this.generateOtp(email);
     }

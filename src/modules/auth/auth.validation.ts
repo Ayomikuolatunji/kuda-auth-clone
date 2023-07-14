@@ -69,13 +69,3 @@ export class ValidationRules {
             .withMessage("Otp is required")
     ];
 }
-
-export interface Profile {
-    firstName: string;
-    middleName: string;
-    lastName: string;
-    gender: string;
-    dateOfBirth: string;
-    userName: string;
-    phoneNumber: string;
-}

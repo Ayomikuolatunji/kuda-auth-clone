@@ -14,3 +14,13 @@ export interface LoginPayload {
 export  interface ResendOtpPayload {
     email: string;
 }
+
+export interface Profile {
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    gender: string;
+    dateOfBirth: string;
+    userName: string;
+    phoneNumber: string;
+}

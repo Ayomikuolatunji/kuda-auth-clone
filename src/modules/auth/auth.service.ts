@@ -76,7 +76,7 @@ class AuthService {
         sgMail.setApiKey(config.sendgrid.SENDGRID_API_KEY);
         const msg = {
             to: email,
-            from: process.env.SENDGRID_VERIFIED_SENDER as string,
+            from: config.sendgrid.SENDGRID_VERIFIED_SENDER as string,
             subject: 'OTP for Email Verification',
             text: `Your OTP for email verification is ${otp}`,
             html: `<b>Your OTP for email verification is ${otp}</b>`,

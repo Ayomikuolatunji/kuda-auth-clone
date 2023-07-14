@@ -60,7 +60,6 @@ class AuthService {
 
     }
     private async generateOtp(email: string): Promise<void> {
-
         const otp = otpGenerator.generate(6, { digits: true, specialChars: false, upperCaseAlphabets: false, lowerCaseAlphabets: false });
         const updateUser = await prisma.user.update({
             where: { email },
@@ -70,7 +69,6 @@ class AuthService {
             throwError('Encounter error', StatusCodes.INTERNAL_SERVER_ERROR);
         }
         await this.sendOtpEmail(email, 12344);
-
     }
     private async sendOtpEmail(email: string, otp: number): Promise<void> {
         sgMail.setApiKey(config.sendgrid.SENDGRID_API_KEY);

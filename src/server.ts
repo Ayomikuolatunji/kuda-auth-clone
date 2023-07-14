@@ -1,5 +1,4 @@
 import bodyParser from "body-parser";
-import dotenv from "dotenv";
 import express from "express"
 import cors from "cors";
 import swaggerUi from 'swagger-ui-express';
@@ -10,11 +9,8 @@ import prisma from "./database/database";
 import { PrismaClient } from "@prisma/client";
 import { pageNotFound } from "./middleware/404Page";
 import v1Api from "./app";
+import { config } from "./configurations/config";
 const swaggerDocument = require('../swagger.json')
-
-const port = process.env.PORT || 8080;
-
-dotenv.config();
 
 const app = express()
 
@@ -44,8 +40,8 @@ class CreateDBConnect {
     try {
       await this.db.$connect();
       console.log("Connected to database successfully");
-      app.listen(port, () =>
-        console.log(`Server started on port ${port}`)
+      app.listen(config.server.PORT, () =>
+        console.log(`Server started on port ${config.server.PORT}`)
       );
     } catch (error: any) {
       console.error("Failed to connect to database", error.message);

@@ -8,28 +8,13 @@ import { StatusCodes } from 'http-status-codes';
 import sgMail from '@sendgrid/mail';
 import otpGenerator from 'otp-generator';
 import prisma from '../../database/database';
+import { config } from '../../configurations/config';
 
 
 dotenv.config();
 
 
 class AuthService {
-    public async login({ email, password }: LoginPayload) {
-        const user: UserType | null = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-            throwError('User not found', StatusCodes.NOT_FOUND);
-        } else {
-            const passwordIsValid = bcrypt.compareSync(password, user.password);
-            if (!passwordIsValid) {
-                throwError('Password is not valid', StatusCodes.BAD_REQUEST);
-            }
-            const token: string = jwt.sign({ id: user.id }, process.env.SECRET as string, {
-                expiresIn: 86400,
-            });
-            return { token, id: user.id, emailVerified: user.emailVerified };
-        }
-
-    }
     public async signup({ currency, email, password, referralCode }: SignUpPayload) {
         try {
             const account = await prisma.$transaction(async (transaction) => {
@@ -58,7 +43,22 @@ class AuthService {
             throwError(error.message, StatusCodes.INSUFFICIENT_STORAGE);
         }
     }
+    public async login({ email, password }: LoginPayload) {
+        const user: UserType | null = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            throwError('User not found', StatusCodes.NOT_FOUND);
+        } else {
+            const passwordIsValid = bcrypt.compareSync(password, user.password);
+            if (!passwordIsValid) {
+                throwError('Password is not valid', StatusCodes.BAD_REQUEST);
+            }
+            const token: string = jwt.sign({ id: user.id }, config.jwt.JWT_SECRET, {
+                expiresIn: 86400,
+            });
+            return { token, id: user.id, emailVerified: user.emailVerified };
+        }
 
+    }
     private async generateOtp(email: string): Promise<void> {
 
         const otp = otpGenerator.generate(6, { digits: true, specialChars: false, upperCaseAlphabets: false, lowerCaseAlphabets: false });
@@ -73,7 +73,7 @@ class AuthService {
 
     }
     private async sendOtpEmail(email: string, otp: number): Promise<void> {
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+        sgMail.setApiKey(config.sendgrid.SENDGRID_API_KEY);
         const msg = {
             to: email,
             from: process.env.SENDGRID_VERIFIED_SENDER as string,
